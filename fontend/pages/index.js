@@ -25,6 +25,7 @@ export default function Home() {
           padding: 0;
           margin: 0;
           font-family: "Inter", sans-serif;
+          background: #fcfcfc;
         }
 
         * {
