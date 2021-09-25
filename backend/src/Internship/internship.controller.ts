@@ -6,7 +6,7 @@ export class InternshipController {
   constructor(private readonly internshipService: InternshipService) {}
 
   @Post()
-  addInternShip(
+  async addInternShip(
     @Body('job') job: string,
     @Body('company_name') company_name: string,
     @Body('company_website') company_website: string,
@@ -23,8 +23,8 @@ export class InternshipController {
     @Body('job_des') job_des?: string,
     @Body('job_respons') job_respons?: Array<string>,
     @Body('who_can_apply') who_can_apply?: Array<string>,
-  ): any {
-    const genId = this.internshipService.insertInternship(
+  ) {
+    const gen = await this.internshipService.insertInternship(
       job,
       company_name,
       company_website,
@@ -42,9 +42,7 @@ export class InternshipController {
       job_respons,
       who_can_apply,
     );
-    return {
-      id: genId,
-    };
+    return gen;
   }
 
   @Get()
