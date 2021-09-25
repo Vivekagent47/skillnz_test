@@ -1,4 +1,4 @@
-import * as mongoose from 'mongoose';
+import * as mongoose from "mongoose";
 
 export const InternshipSchema = new mongoose.Schema({
   job: { type: String, require: true },
