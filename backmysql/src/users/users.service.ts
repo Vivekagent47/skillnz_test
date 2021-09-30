@@ -30,4 +30,13 @@ export class UsersService {
       },
     });
   }
+
+  async findAll(): Promise<User[]> {
+    const users = await User.find();
+
+    return users.map((data) => {
+      delete data.password;
+      return data;
+    });
+  }
 }
