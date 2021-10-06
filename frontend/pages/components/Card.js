@@ -1,3 +1,4 @@
+import React from "react";
 import CardData from "../data/raw";
 import Heart from "../Icons/Heart";
 import WhatsappIcon from "../Icons/whatsappicon";
