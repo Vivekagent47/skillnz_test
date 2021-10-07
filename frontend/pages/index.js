@@ -1,5 +1,5 @@
 import Head from "next/head";
-import Card from "./components/Card";
+import Cards from "./components/Card";
 
 export default function Home() {
   return (
@@ -15,9 +15,7 @@ export default function Home() {
         ></link>
       </Head>
 
-      <Card />
-
-      <style jsx>{``}</style>
+      <Cards />
 
       <style jsx global>{`
         html,
