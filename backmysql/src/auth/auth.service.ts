@@ -1,37 +1,110 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { User, CreateUserDto, UserService } from '../user';
+import { LoginCredential } from './login-credential.dto';
+import { TokenDto } from './token.dto';
+import { RefreshTokenDto } from './refresh-token.dto';
+import { JwtService } from '@nestjs/jwt';
 
-import { User } from "../users/users.entity";
-import { UsersService } from "../users/users.service";
-import { AuthLoginDto } from "./auth-login.dto";
-
+/**
+ * Auth service
+ */
 @Injectable()
 export class AuthService {
+  /**
+   * @ignore
+   */
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
+
+    private readonly jwtService: JwtService,
   ) {}
 
-  async login(authLoginDto: AuthLoginDto) {
-    const user = await this.validateUser(authLoginDto);
-
-    const payload = {
-      userId: user.id,
-    };
-
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+  /**
+   * register user
+   */
+  async registerUser(userData: CreateUserDto): Promise<User> {
+    return this.userService.createUser(userData);
   }
 
-  async validateUser(authLoginDto: AuthLoginDto): Promise<User> {
-    const { email, password } = authLoginDto;
+  /**
+   * login user
+   */
+  async login(credential: LoginCredential): Promise<TokenDto> {
+    const user = await this.userService.getUserByEmail(credential.email);
 
-    const user = await this.usersService.findByEmail(email);
-    if (!(await user?.validatePassword(password))) {
-      throw new UnauthorizedException();
+    if (!user) {
+      throw new Error('Invalid credentials');
     }
 
-    return user;
+    const isMatched = await this.userService.checkPassword(
+      user,
+      credential.password,
+    );
+
+    if (!isMatched) {
+      throw new Error('Invalid credentials');
+    }
+
+    if (!user.isActive) {
+      throw new Error('Inactive user');
+    }
+
+    const authToken: TokenDto = this.generateAuthToken(user);
+    return Promise.resolve(authToken);
+  }
+
+  /**
+   * refresh token
+   */
+  async refreshToken(token: RefreshTokenDto): Promise<TokenDto> {
+    let payload: any;
+
+    try {
+      payload = this.jwtService.verify(token.refreshToken);
+    } catch (error) {
+      throw new Error('Invalid refresh token');
+    }
+
+    const { userId, type } = payload;
+
+    if (type !== 'refresh') {
+      throw new Error('Wrong token type');
+    }
+
+    const user = await this.userService.getUserById(userId);
+
+    if (!user) {
+      throw new Error('Invalid user');
+    }
+
+    if (!user.isActive) {
+      throw new Error('Inactive user');
+    }
+
+    const authToken = this.generateAuthToken(user);
+    return Promise.resolve(authToken);
+  }
+
+  /**
+   * Generate Auth Token
+   * @param user
+   */
+  private generateAuthToken(user: User): TokenDto {
+    const accessToken = this.jwtService.sign({
+      sub: () => user.email,
+      type: 'access',
+      email: user.email,
+      roles: user.roles,
+      userId: user.id,
+    });
+
+    const refreshToken = this.jwtService.sign({
+      sub: () => user.email,
+      type: 'refresh',
+      userId: user.id,
+    });
+
+    return { accessToken, refreshToken };
   }
 }

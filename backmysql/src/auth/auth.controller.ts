@@ -1,21 +1,70 @@
-import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
+import {
+  Inject,
+  Controller,
+  Post,
+  Body,
+  HttpStatus,
+  HttpException,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { CreateUserDto, User } from '../user';
+import { LoginCredential } from './login-credential.dto';
+import { TokenDto } from './token.dto';
+import { RefreshTokenDto } from './refresh-token.dto';
+import { Logger } from 'winston';
 
-import { AuthService } from "./auth.service";
-import { AuthLoginDto } from "./auth-login.dto";
-import { JwtAuthGuard } from "./jwt-auth.guard";
-
-@Controller("auth")
+/**
+ * Auth controller
+ */
+@Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  /**
+   * @ignore
+   */
+  constructor(
+    @Inject('winston')
+    private readonly logger: Logger,
+    private readonly service: AuthService,
+  ) {}
 
-  @Post()
-  async login(@Body() authLoginDto: AuthLoginDto) {
-    return this.authService.login(authLoginDto);
+  /**
+   * Create new user
+   */
+  @Post('register')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async register(@Body() userDto: CreateUserDto): Promise<User> {
+    try {
+      return await this.service.registerUser(userDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  async test() {
-    return "Success!";
+  /**
+   * Login users
+   */
+  @Post('login')
+  async login(@Body() credential: LoginCredential): Promise<TokenDto> {
+    try {
+      return await this.service.login(credential);
+    } catch (error) {
+      this.logger.warn('Login attempt failed', credential);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Access token generation using refresh token
+   */
+  @Post('refresh-token')
+  async refreshToken(@Body() token: RefreshTokenDto): Promise<TokenDto> {
+    try {
+      return this.service.refreshToken(token);
+    } catch (error) {
+      this.logger.warn('Refresh token attempt failed', token);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }
