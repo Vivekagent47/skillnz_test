@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
-import { CreateUserDto } from './create-user.dto';
-import * as bcrypt from 'bcryptjs';
+import { Injectable } from "@nestjs/common";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { User } from "./user.entity";
+import { CreateUserDto } from "./create-user.dto";
+import * as bcrypt from "bcryptjs";
 
 /**
  * User service
@@ -22,7 +22,7 @@ export class UserService {
     const user = new User();
     user.name = userData.name;
     user.email = userData.email;
-    user.roles = ['user'];
+    user.roles = ["user"];
     user.isActive = true;
     user.password = await this.hashPassword(userData.password);
 
@@ -30,7 +30,7 @@ export class UserService {
       return this.userRepository.save(user);
     } catch (error) {
       // process email duplicate err msg
-      if (error.code === 'ER_DUP_ENTRY') {
+      if (error.code === "ER_DUP_ENTRY") {
         throw new Error(`user already exists with email ${user.name}`);
       }
 

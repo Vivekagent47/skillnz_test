@@ -4,7 +4,7 @@ import {
   Injectable,
   HttpStatus,
   HttpException,
-} from '@nestjs/common';
+} from "@nestjs/common";
 
 /**
  * Auth guard for user
@@ -15,7 +15,7 @@ export class IsUser implements CanActivate {
     const user = this.getContextUser(context);
 
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+      throw new HttpException("User not found", HttpStatus.UNAUTHORIZED);
     }
 
     return Promise.resolve(true);

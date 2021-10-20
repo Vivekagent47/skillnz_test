@@ -37,3 +37,4 @@ lerna-debug.log*
 
 # secret keys
 .env
+/orm.config.ts

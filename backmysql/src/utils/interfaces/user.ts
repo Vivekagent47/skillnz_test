@@ -1,7 +1,7 @@
 /**
  * type user roles
  */
-export type UserRole = 'user' | 'admin';
+export type UserRole = "user" | "admin";
 
 /**
  * Auth user interface

@@ -4,17 +4,17 @@ import {
   CallHandler,
   NestInterceptor,
   ExecutionContext,
-} from '@nestjs/common';
+} from "@nestjs/common";
 
-import { Logger } from 'winston';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { ServerResponse, IncomingMessage } from 'http';
+import { Logger } from "winston";
+import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
+import { ServerResponse, IncomingMessage } from "http";
 
 @Injectable()
 export class LoggerInterceptor implements NestInterceptor {
   constructor(
-    @Inject('winston')
+    @Inject("winston")
     private readonly logger: Logger,
   ) {}
 
@@ -33,7 +33,7 @@ export class LoggerInterceptor implements NestInterceptor {
           host: request.headers.host,
           origin: request.headers.origin,
           referer: request.headers.referer,
-          'user-agent': request.headers['user-agent'],
+          "user-agent": request.headers["user-agent"],
         };
         this.logger.info(
           `req: ${request.method} ${request.url} res: ${response.statusCode}`,

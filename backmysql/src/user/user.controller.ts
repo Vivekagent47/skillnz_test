@@ -6,17 +6,17 @@ import {
   HttpException,
   UseInterceptors,
   ClassSerializerInterceptor,
-} from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+} from "@nestjs/common";
+import { ApiBearerAuth } from "@nestjs/swagger";
 
-import { User } from './user.entity';
-import { UserService } from './user.service';
-import { IAuthUser, AuthUser, RolesGuard, Roles } from '../utils';
+import { User } from "./user.entity";
+import { UserService } from "./user.service";
+import { IAuthUser, AuthUser, RolesGuard, Roles } from "../utils";
 
 /**
  * User controller
  */
-@Controller('user')
+@Controller("user")
 export class UserController {
   /**
    * @ignore
@@ -26,10 +26,10 @@ export class UserController {
   /**
    * logged in user's profile
    */
-  @Get('/me')
+  @Get("/me")
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
-  @Roles('user', 'admin')
+  @Roles("user", "admin")
   @UseInterceptors(ClassSerializerInterceptor)
   async getMe(@AuthUser() user: IAuthUser): Promise<User> {
     try {
@@ -45,7 +45,7 @@ export class UserController {
   @Get()
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
-  @Roles('admin')
+  @Roles("admin")
   @UseInterceptors(ClassSerializerInterceptor)
   async getAllUser(): Promise<User[]> {
     try {

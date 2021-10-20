@@ -5,10 +5,10 @@ import {
   UpdateDateColumn,
   PrimaryGeneratedColumn,
   Unique,
-} from 'typeorm';
-import { Exclude } from 'class-transformer';
+} from "typeorm";
+import { Exclude } from "class-transformer";
 
-export type UserRole = 'admin' | 'user';
+export type UserRole = "admin" | "user";
 
 /**
  * User entity
@@ -30,7 +30,7 @@ export class User {
   /**
    * email
    */
-  @Unique('email', ['email'])
+  @Unique("email", ["email"])
   @Column({ length: 320, nullable: false })
   email: string;
 
@@ -44,26 +44,26 @@ export class User {
   /**
    * user activation status
    */
-  @Column({ name: 'is_active' })
+  @Column({ name: "is_active" })
   isActive: boolean;
 
   /**
    * user roles: admin, user
    */
-  @Column('simple-array')
+  @Column("simple-array")
   roles: UserRole[];
 
   /**
    * created at
    */
   @Exclude()
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
   /**
    * updated at
    */
   @Exclude()
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 }
