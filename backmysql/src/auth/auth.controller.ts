@@ -46,7 +46,7 @@ export class AuthController {
    * Login users
    */
   @Post("login")
-  async login(@Body() credential: LoginCredential): Promise<TokenDto> {
+  async login(@Body() credential: LoginCredential): Promise<any> {
     try {
       return await this.service.login(credential);
     } catch (error) {

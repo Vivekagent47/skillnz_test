@@ -1,5 +1,6 @@
 import {
   Get,
+  Param,
   UseGuards,
   Controller,
   HttpStatus,
@@ -11,29 +12,26 @@ import { ApiBearerAuth } from "@nestjs/swagger";
 
 import { User } from "./user.entity";
 import { UserService } from "./user.service";
-import { IAuthUser, AuthUser, RolesGuard, Roles } from "../utils";
+import { RolesGuard, Roles } from "../utils";
 
 /**
  * User controller
  */
 @Controller("user")
 export class UserController {
-  /**
-   * @ignore
-   */
   constructor(private readonly service: UserService) {}
 
   /**
    * logged in user's profile
    */
-  @Get("/me")
+  @Get("/:id")
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles("user", "admin")
   @UseInterceptors(ClassSerializerInterceptor)
-  async getMe(@AuthUser() user: IAuthUser): Promise<User> {
+  async getMe(@Param() userID: number): Promise<User> {
     try {
-      return await this.service.getUserByEmail(user.email);
+      return await this.service.getUserById(userID);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

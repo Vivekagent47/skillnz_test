@@ -10,9 +10,6 @@ import { JwtService } from "@nestjs/jwt";
  */
 @Injectable()
 export class AuthService {
-  /**
-   * @ignore
-   */
   constructor(
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
@@ -30,7 +27,7 @@ export class AuthService {
   /**
    * login user
    */
-  async login(credential: LoginCredential): Promise<TokenDto> {
+  async login(credential: LoginCredential): Promise<any> {
     const user = await this.userService.getUserByEmail(credential.email);
 
     if (!user) {
@@ -49,9 +46,12 @@ export class AuthService {
     if (!user.isActive) {
       throw new Error("Inactive user");
     }
+    delete user.password;
+    delete user.createdAt;
+    delete user.updatedAt;
 
     const authToken: TokenDto = this.generateAuthToken(user);
-    return Promise.resolve(authToken);
+    return Promise.resolve({ authToken, user });
   }
 
   /**
