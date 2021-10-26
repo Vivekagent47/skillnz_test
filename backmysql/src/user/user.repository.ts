@@ -1,5 +1,5 @@
-import { Repository, EntityRepository } from "typeorm";
-import { User } from "./user.entity";
+import { Repository, EntityRepository } from 'typeorm';
+import { User } from './user.entity';
 
 /**
  * User repository class

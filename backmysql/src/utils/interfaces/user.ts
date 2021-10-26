@@ -1,7 +1,9 @@
 /**
  * type user roles
  */
-export type UserRole = "user" | "admin";
+export type UserRole = 'user' | 'admin';
+
+export type UserType = 'student' | 'recuiter';
 
 /**
  * Auth user interface
@@ -20,10 +22,22 @@ export interface IAuthUser {
   /**
    * optional user name
    */
-  name?: string;
+  firstName: string;
+  lastName: string;
 
   /**
    * user roles array
    */
   roles: [UserRole];
+
+  /**
+   * type of user student or recuiter
+   */
+  userType: UserType;
+
+  /**
+   * mobile number and country code
+   */
+  mobileNumber?: number;
+  countryCode?: string;
 }

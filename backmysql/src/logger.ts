@@ -1,7 +1,7 @@
-import * as winston from "winston";
+import * as winston from 'winston';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const NODE_ENV = process.env.NODE_ENV || "development";
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 export const loggerConf = {
   format: winston.format.prettyPrint({
@@ -10,7 +10,7 @@ export const loggerConf = {
   }),
   transports: [
     new winston.transports.Console({
-      consoleWarnLevels: ["info", "warn", "error"],
+      consoleWarnLevels: ['info', 'warn', 'error'],
     }),
   ],
 };

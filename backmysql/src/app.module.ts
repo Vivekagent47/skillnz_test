@@ -1,28 +1,28 @@
-import { Module, MiddlewareConsumer, RequestMethod } from "@nestjs/common";
-import { JwtModule } from "@nestjs/jwt";
-import { TypeOrmModule } from "@nestjs/typeorm";
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { WinstonModule } from "nest-winston";
-import { loggerConf } from "./logger";
-import { APP_INTERCEPTOR } from "@nestjs/core";
+import { WinstonModule } from 'nest-winston';
+import { loggerConf } from './logger';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
-import { SharedModule } from "./shared/shared.module";
-import { UtilsModule } from "./utils/utils.module";
-import { AuthModule } from "./auth/auth.module";
-import { UserModule } from "./user/user.module";
+import { SharedModule } from './shared/shared.module';
+import { UtilsModule } from './utils/utils.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
-import { JwtTokenMiddleware, LoggerInterceptor } from "./utils";
+import { JwtTokenMiddleware, LoggerInterceptor } from './utils';
 
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
-import * as ormConfig from "./orm.config";
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import * as ormConfig from './orm.config';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
     JwtModule.register({
-      secret: "M6[n0@u0t[O$Q1(",
-      signOptions: { expiresIn: "60s" },
+      secret: 'M6[n0@u0t[O$Q1(',
+      signOptions: { expiresIn: '60s' },
     }),
     WinstonModule.forRoot(loggerConf),
     AuthModule,
@@ -43,6 +43,6 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(JwtTokenMiddleware)
-      .forRoutes({ path: "*", method: RequestMethod.ALL });
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }

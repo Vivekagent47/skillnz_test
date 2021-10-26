@@ -1,6 +1,6 @@
-import { Injectable, NestMiddleware } from "@nestjs/common";
-import * as jwt from "jsonwebtoken";
-import { JwtService } from "@nestjs/jwt";
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 
 /**
  * JWT token middle wire
@@ -53,7 +53,7 @@ export class JwtTokenMiddleware implements NestMiddleware {
    */
   private getBearerToken(req: any): string {
     try {
-      return req.headers.authorization.split(" ")[1];
+      return req.headers.authorization.split(' ')[1];
     } catch (error) {
       return null;
     }

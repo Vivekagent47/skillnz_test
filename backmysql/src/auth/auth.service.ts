@@ -1,9 +1,9 @@
-import { Injectable, Inject, forwardRef } from "@nestjs/common";
-import { User, CreateUserDto, UserService } from "../user";
-import { LoginCredential } from "./login-credential.dto";
-import { TokenDto } from "./token.dto";
-import { RefreshTokenDto } from "./refresh-token.dto";
-import { JwtService } from "@nestjs/jwt";
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { User, CreateUserDto, UserService } from '../user';
+import { LoginCredential } from './login-credential.dto';
+import { TokenDto } from './token.dto';
+import { RefreshTokenDto } from './refresh-token.dto';
+import { JwtService } from '@nestjs/jwt';
 
 /**
  * Auth service
@@ -31,7 +31,7 @@ export class AuthService {
     const user = await this.userService.getUserByEmail(credential.email);
 
     if (!user) {
-      throw new Error("Invalid credentials");
+      throw new Error('Invalid credentials');
     }
 
     const isMatched = await this.userService.checkPassword(
@@ -40,15 +40,13 @@ export class AuthService {
     );
 
     if (!isMatched) {
-      throw new Error("Invalid credentials");
+      throw new Error('Invalid credentials');
     }
 
     if (!user.isActive) {
-      throw new Error("Inactive user");
+      throw new Error('Inactive user');
     }
     delete user.password;
-    delete user.createdAt;
-    delete user.updatedAt;
 
     const authToken: TokenDto = this.generateAuthToken(user);
     return Promise.resolve({ authToken, user });
@@ -63,23 +61,23 @@ export class AuthService {
     try {
       payload = this.jwtService.verify(token.refreshToken);
     } catch (error) {
-      throw new Error("Invalid refresh token");
+      throw new Error('Invalid refresh token');
     }
 
     const { userId, type } = payload;
 
-    if (type !== "refresh") {
-      throw new Error("Wrong token type");
+    if (type !== 'refresh') {
+      throw new Error('Wrong token type');
     }
 
     const user = await this.userService.getUserById(userId);
 
     if (!user) {
-      throw new Error("Invalid user");
+      throw new Error('Invalid user');
     }
 
     if (!user.isActive) {
-      throw new Error("Inactive user");
+      throw new Error('Inactive user');
     }
 
     const authToken = this.generateAuthToken(user);
@@ -93,7 +91,7 @@ export class AuthService {
   private generateAuthToken(user: User): TokenDto {
     const accessToken = this.jwtService.sign({
       sub: () => user.email,
-      type: "access",
+      type: 'access',
       email: user.email,
       roles: user.roles,
       userId: user.id,
@@ -101,7 +99,7 @@ export class AuthService {
 
     const refreshToken = this.jwtService.sign({
       sub: () => user.email,
-      type: "refresh",
+      type: 'refresh',
       userId: user.id,
     });
 

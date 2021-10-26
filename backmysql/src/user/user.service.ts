@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { Repository } from "typeorm";
-import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "./user.entity";
-import { CreateUserDto } from "./create-user.dto";
-import * as bcrypt from "bcryptjs";
+import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './user.entity';
+import { CreateUserDto } from './create-user.dto';
+import * as bcrypt from 'bcryptjs';
 
 /**
  * User service
@@ -20,18 +20,22 @@ export class UserService {
    */
   async createUser(userData: CreateUserDto): Promise<User> {
     const user = new User();
-    user.name = userData.name;
+    user.firstName = userData.firstName;
+    user.lastName = userData.lastName;
     user.email = userData.email;
-    user.roles = ["user"];
+    user.roles = ['user'];
     user.isActive = true;
+    user.userType = userData.userType;
+    user.mobileNumber = userData.mobileNumber ? userData.mobileNumber : 0;
+    user.countryCode = userData.countryCode ? userData.countryCode : '';
     user.password = await this.hashPassword(userData.password);
 
     try {
       return this.userRepository.save(user);
     } catch (error) {
       // process email duplicate err msg
-      if (error.code === "ER_DUP_ENTRY") {
-        throw new Error(`user already exists with email ${user.name}`);
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new Error(`user already exists with email ${user.email}`);
       }
 
       throw error;
@@ -41,7 +45,7 @@ export class UserService {
   /**
    * get user by id
    */
-  getUserById(id: number): Promise<User> {
+  getUserById(id: string): Promise<User> {
     return this.userRepository.findOne(id);
   }
 
@@ -83,5 +87,66 @@ export class UserService {
         return error || !ok ? resolve(false) : resolve(true);
       });
     });
+  }
+
+  /**
+   * Update user
+   */
+  async updateUser(id: string, data: Partial<any>) {
+    const user = await this.getUserById(id);
+
+    if (data.password || data.roles) {
+      throw new Error('Password or roles is not changed from this route');
+    }
+
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+
+    await this.userRepository.update(id, data);
+
+    const newUser = await this.userRepository.findOne({ id });
+    delete newUser.password;
+    return newUser;
+  }
+
+  /**
+   * Update Password
+   */
+  async updatePassword(
+    id: string,
+    data: {
+      email: string;
+      prvPassword: string;
+      newPassword: string;
+    },
+  ) {
+    const user = await this.getUserByEmail(data.email);
+
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+
+    if (id !== user.id) {
+      throw new Error('Invalid credentials');
+    }
+
+    const isMatched = await this.checkPassword(user, data.prvPassword);
+
+    if (!isMatched) {
+      throw new Error('Invalid Old Password');
+    }
+
+    const hashNew = await this.hashPassword(data.newPassword);
+
+    try {
+      await this.userRepository.update(user.id, { password: hashNew });
+      return {
+        success: true,
+        message: 'Password Changed Successfully',
+      };
+    } catch {
+      throw new Error('Some error');
+    }
   }
 }
