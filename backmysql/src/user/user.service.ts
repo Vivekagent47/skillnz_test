@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
-import { CreateUserDto } from './create-user.dto';
 import * as bcrypt from 'bcryptjs';
+import { User } from './user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 /**
  * User service
@@ -113,14 +114,7 @@ export class UserService {
   /**
    * Update Password
    */
-  async updatePassword(
-    id: string,
-    data: {
-      email: string;
-      prvPassword: string;
-      newPassword: string;
-    },
-  ) {
+  async updatePassword(id: string, data: UpdatePasswordDto) {
     const user = await this.getUserByEmail(data.email);
 
     if (!user) {

@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto, User } from '../user';
-import { LoginCredential } from './login-credential.dto';
-import { TokenDto } from './token.dto';
-import { RefreshTokenDto } from './refresh-token.dto';
+import { LoginCredential } from './dto/login-credential.dto';
+import { TokenDto } from './dto/token.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 // import { Logger } from 'winston';
 
 /**

@@ -15,6 +15,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { RolesGuard, Roles } from '../utils';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 /**
  * User controller
@@ -31,9 +32,9 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Roles('user', 'admin')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getMe(@Param() userID: string): Promise<User> {
+  async getMe(@Param('id') id: string): Promise<User> {
     try {
-      return await this.service.getUserById(userID);
+      return await this.service.getUserById(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -55,7 +56,7 @@ export class UserController {
     }
   }
 
-  @Patch(':id')
+  @Patch('/update/:id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles('admin', 'user')
@@ -78,7 +79,7 @@ export class UserController {
   @UseInterceptors(ClassSerializerInterceptor)
   async updatePassword(
     @Param('id') id: string,
-    @Body() data: { email: string; prvPassword: string; newPassword: string },
+    @Body() data: UpdatePasswordDto,
   ): Promise<any> {
     try {
       return await this.service.updatePassword(id, data);

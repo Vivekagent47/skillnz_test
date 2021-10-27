@@ -5,7 +5,7 @@ import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
 
 import { CreateUserDto } from '../../user';
-import { LoginCredential } from '../login-credential.dto';
+import { LoginCredential } from '../dto/login-credential.dto';
 
 describe('Auth Controller', () => {
   let controller: AuthController;
@@ -18,6 +18,9 @@ describe('Auth Controller', () => {
     lastName: 'Joe',
     email: 'joe@example.com',
     password: '123456',
+    mobileNumber: 9876543210,
+    countryCode: '+91',
+    userType: 'student',
   };
 
   const mockCredential: LoginCredential = {

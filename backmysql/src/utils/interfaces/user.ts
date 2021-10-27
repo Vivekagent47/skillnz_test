@@ -3,7 +3,7 @@
  */
 export type UserRole = 'user' | 'admin';
 
-export type UserType = 'student' | 'recuiter';
+export type UserType = 'student' | 'recruiter';
 
 /**
  * Auth user interface

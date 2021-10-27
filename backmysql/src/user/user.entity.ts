@@ -10,7 +10,7 @@ import { Exclude } from 'class-transformer';
 
 export type UserRole = 'admin' | 'user';
 
-export type UserType = 'student' | 'recuiter';
+export type UserType = 'student' | 'recruiter';
 
 /**
  * User entity
