@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UserRole } from '.';
 
 /**
  * User service
@@ -96,8 +97,10 @@ export class UserService {
   async updateUser(id: string, data: Partial<any>) {
     const user = await this.getUserById(id);
 
-    if (data.password || data.roles) {
-      throw new Error('Password or roles is not changed from this route');
+    if (data.password || data.roles || data.isActive) {
+      throw new Error(
+        'Password or roles or actice state is not changed from this route',
+      );
     }
 
     if (!user) {
@@ -125,6 +128,10 @@ export class UserService {
       throw new Error('Invalid credentials');
     }
 
+    if (!user.isActive) {
+      throw new Error('User is not active');
+    }
+
     const isMatched = await this.checkPassword(user, data.prvPassword);
 
     if (!isMatched) {
@@ -138,6 +145,32 @@ export class UserService {
       return {
         success: true,
         message: 'Password Changed Successfully',
+      };
+    } catch {
+      throw new Error('Some error');
+    }
+  }
+
+  async updateRole(id: string, data: { roles: UserRole[] }) {
+    const user = await this.getUserById(id);
+
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+
+    if (id !== user.id) {
+      throw new Error('Invalid credentials');
+    }
+
+    if (!user.isActive) {
+      throw new Error('User is not active');
+    }
+
+    try {
+      await this.userRepository.update(user.id, { roles: data.roles });
+      return {
+        success: true,
+        message: 'Role Changed Successfully',
       };
     } catch {
       throw new Error('Some error');

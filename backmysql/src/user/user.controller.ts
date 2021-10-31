@@ -16,6 +16,7 @@ import { User } from './user.entity';
 import { UserService } from './user.service';
 import { RolesGuard, Roles } from '../utils';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UserRole } from '.';
 
 /**
  * User controller
@@ -83,6 +84,22 @@ export class UserController {
   ): Promise<any> {
     try {
       return await this.service.updatePassword(id, data);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Patch('/roleUpdate/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async updateRole(
+    @Param('id') id: string,
+    @Body() data: { roles: UserRole[] },
+  ) {
+    try {
+      return await this.service.updateRole(id, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
