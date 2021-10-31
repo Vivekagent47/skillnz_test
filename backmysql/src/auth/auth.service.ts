@@ -1,9 +1,10 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+
+import { TokenDto } from './dto/token.dto';
 import { User, CreateUserDto, UserService } from '../user';
 import { LoginCredential } from './dto/login-credential.dto';
-import { TokenDto } from './dto/token.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { JwtService } from '@nestjs/jwt';
 
 /**
  * Auth service
