@@ -10,6 +10,7 @@ import { SharedModule } from './shared/shared.module';
 import { UtilsModule } from './utils/utils.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { InternshipModule } from './internship/internship.module';
 
 import { JwtTokenMiddleware, LoggerInterceptor } from './utils';
 
@@ -29,6 +30,7 @@ import * as ormConfig from './orm.config';
     UserModule,
     SharedModule,
     UtilsModule,
+    InternshipModule,
   ],
   controllers: [AppController],
   providers: [
