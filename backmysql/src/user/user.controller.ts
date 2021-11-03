@@ -1,5 +1,7 @@
 import {
   Get,
+  Body,
+  Put,
   Param,
   UseGuards,
   Controller,
@@ -7,8 +9,6 @@ import {
   HttpException,
   UseInterceptors,
   ClassSerializerInterceptor,
-  Patch,
-  Body,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -57,7 +57,7 @@ export class UserController {
     }
   }
 
-  @Patch('/update/:id')
+  @Put('/update/:id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles('admin', 'user')
@@ -73,7 +73,7 @@ export class UserController {
     }
   }
 
-  @Patch('/passwordUpdate/:id')
+  @Put('/passwordUpdate/:id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles('user')
@@ -89,7 +89,7 @@ export class UserController {
     }
   }
 
-  @Patch('/roleUpdate/:id')
+  @Put('/roleUpdate/:id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles('admin')

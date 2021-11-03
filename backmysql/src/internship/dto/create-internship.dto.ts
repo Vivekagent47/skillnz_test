@@ -64,7 +64,7 @@ export class CreateInternshipDto {
   readonly responsibilities: string[];
 
   @ApiProperty()
-  readonly whoCanApply: string[];
+  readonly perks: string[];
 
   @IsNotEmpty()
   @ApiProperty()

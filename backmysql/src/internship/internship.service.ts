@@ -56,7 +56,7 @@ export class InternshipService {
     internship.responsibilities = data.responsibilities
       ? data.responsibilities
       : [];
-    internship.whoCanApply = data.whoCanApply ? data.whoCanApply : [];
+    internship.perks = data.perks ? data.perks : [];
 
     let payload: any;
 

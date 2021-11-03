@@ -143,7 +143,7 @@ export class Internship {
    * Who is eligible for the position
    */
   @Column('simple-array')
-  whoCanApply: string[];
+  perks: string[];
 
   /**
    * Category of the internship
