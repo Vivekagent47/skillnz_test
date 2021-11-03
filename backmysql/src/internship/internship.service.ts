@@ -97,6 +97,7 @@ export class InternshipService {
     const totalCount = await this.internshipRepo.count();
     const products = await this.internshipRepo
       .createQueryBuilder()
+      .orderBy('created_at', 'DESC')
       .offset(skippedItems)
       .andHaving('isActive = :isActive', { isActive: true })
       .limit(paginationDto.limit)
@@ -111,6 +112,13 @@ export class InternshipService {
   }
 
   /**
+   * get All the internship
+   */
+  async getAllInternships(): Promise<Internship[]> {
+    return await this.internshipRepo.find();
+  }
+
+  /**
    * gel internship by ID
    */
   async getInternshipById(id: string): Promise<Internship> {
@@ -120,7 +128,11 @@ export class InternshipService {
   /**
    * Update the internship
    */
-  async updateInternship(token: string, id: string, data: Partial<Internship>) {
+  async updateInternship(
+    token: string,
+    id: string,
+    data: Partial<Internship>,
+  ): Promise<{ success: boolean; message: string }> {
     let payload: any;
     try {
       payload = this.jwtService.verify(token.split(' ')[1]);
@@ -156,5 +168,17 @@ export class InternshipService {
     } catch (error) {
       throw error;
     }
+  }
+
+  /**
+   * Activate Internship
+   */
+  async activateInternship(
+    id: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const internship = await this.internshipRepo.findOne(id);
+    internship.isActive = true;
+    await this.internshipRepo.save(internship);
+    return { success: true, message: 'Internship activated successfully' };
   }
 }

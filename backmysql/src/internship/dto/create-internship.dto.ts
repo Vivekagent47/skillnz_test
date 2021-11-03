@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { Category } from '../internship.entity';
 
 /**
  * Internship create dto
@@ -64,4 +65,8 @@ export class CreateInternshipDto {
 
   @ApiProperty()
   readonly whoCanApply: string[];
+
+  @IsNotEmpty()
+  @ApiProperty()
+  readonly category: Category;
 }

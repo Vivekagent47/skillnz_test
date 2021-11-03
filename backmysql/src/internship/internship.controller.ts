@@ -1,5 +1,6 @@
 import {
   Get,
+  Put,
   Post,
   Body,
   Param,
@@ -11,7 +12,6 @@ import {
   HttpStatus,
   UseInterceptors,
   ClassSerializerInterceptor,
-  Put,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -41,6 +41,19 @@ export class InternshipController {
       ...data,
       limit: data.limit > 18 ? 18 : data.limit,
     });
+  }
+
+  @Get('/all')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getAllInternships(): Promise<Internship[]> {
+    try {
+      return await this.service.getAllInternships();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get('/:id')
@@ -81,9 +94,24 @@ export class InternshipController {
     @Headers('authorization') token: string,
     @Param('id') id: string,
     @Body() data: Partial<Internship>,
-  ) {
+  ): Promise<{ success: boolean; message: string }> {
     try {
       return await this.service.updateInternship(token, id, data);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Put('/activate/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async activateInternship(
+    @Param('id') id: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      return await this.service.activateInternship(id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

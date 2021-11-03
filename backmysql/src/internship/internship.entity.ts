@@ -7,6 +7,17 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
+export type Category =
+  | 'engineering'
+  | 'commerce'
+  | 'management'
+  | 'science'
+  | 'arts'
+  | 'medical'
+  | 'law'
+  | 'humanities'
+  | 'other';
+
 /**
  * Internship Entity
  */
@@ -133,4 +144,11 @@ export class Internship {
    */
   @Column('simple-array')
   whoCanApply: string[];
+
+  /**
+   * Category of the internship
+   * @example engineering, commerce, management, science, arts, medical, law, humanities, other
+   */
+  @Column()
+  category: Category;
 }
