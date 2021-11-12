@@ -18,6 +18,26 @@ export type Category =
   | 'humanities'
   | 'other';
 
+// export type Applied = {
+//   studentID: string;
+//   answers: Answer[];
+// };
+
+// export type Answer = {
+//   questionID: string;
+//   answer: string;
+// };
+
+export type AnsType = 'number' | 'string';
+
+export type Question = {
+  id: string;
+  question: string;
+  ansType: AnsType;
+};
+
+export type InternshipType = 'workfromhome' | 'onsite';
+
 /**
  * Internship Entity
  */
@@ -32,8 +52,7 @@ export class Internship {
   /**
    * created at
    */
-  @Exclude()
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 
   /**
@@ -85,6 +104,9 @@ export class Internship {
   @Column('simple-array')
   skills: string[];
 
+  @Column()
+  compensation: boolean;
+
   /**
    * Min value of stipen
    */
@@ -113,7 +135,10 @@ export class Internship {
    * Work for Home or if Office work then place name
    */
   @Column()
-  internshipType: string;
+  internshipType: InternshipType;
+
+  @Column()
+  location: string;
 
   /**
    * Internship period only in months
@@ -151,4 +176,13 @@ export class Internship {
    */
   @Column()
   category: Category;
+
+  @Column('simple-array')
+  questions: Question[];
+
+  @Column()
+  interview: boolean;
+
+  @Column()
+  prePlacementOffer: boolean;
 }

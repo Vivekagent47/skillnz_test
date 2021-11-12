@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, MaxLength, MinLength } from 'class-validator';
-import { Category } from '../internship.entity';
+import { Category, InternshipType } from '../internship.entity';
 
 /**
  * Internship create dto
@@ -31,6 +31,10 @@ export class CreateInternshipDto {
   @ApiProperty()
   readonly skills: string[];
 
+  @IsNotEmpty()
+  @ApiProperty()
+  readonly compensation: boolean;
+
   @ApiProperty()
   readonly minStipen: number;
 
@@ -46,7 +50,10 @@ export class CreateInternshipDto {
 
   @IsNotEmpty()
   @ApiProperty()
-  readonly internshipType: string;
+  readonly internshipType: InternshipType;
+
+  @ApiProperty()
+  readonly location: string;
 
   @IsNotEmpty()
   @ApiProperty()
@@ -60,13 +67,23 @@ export class CreateInternshipDto {
   @ApiProperty()
   readonly applyBy: Date;
 
+  @IsNotEmpty()
   @ApiProperty()
   readonly responsibilities: string[];
 
+  @IsNotEmpty()
   @ApiProperty()
   readonly perks: string[];
 
   @IsNotEmpty()
   @ApiProperty()
   readonly category: Category;
+
+  @IsNotEmpty()
+  @ApiProperty()
+  readonly interview: boolean;
+
+  @IsNotEmpty()
+  @ApiProperty()
+  readonly prePlacementOffer: boolean;
 }

@@ -41,22 +41,63 @@ export class InternshipService {
     internship.isActive = false;
     internship.jobName = data.jobName;
     internship.companyName = data.companyName;
-    internship.companyUrl = data.companyUrl;
-    internship.aboutCompany = data.aboutCompany;
+    internship.companyUrl = data.companyUrl ? data.companyUrl : '';
+    internship.aboutCompany = data.aboutCompany ? data.aboutCompany : '';
     internship.jobDescription = data.jobDescription ? data.jobDescription : '';
     internship.skills = data.skills;
+    internship.compensation = data.compensation;
+
+    if (data.compensation === true) {
+      internship.minStipen = data.minStipen;
+      internship.maxStipen = data.maxStipen;
+      internship.currencyType = data.currencyType;
+    } else {
+      internship.minStipen = 0;
+      internship.maxStipen = 0;
+      internship.currencyType = '';
+    }
+
     internship.noOfOpening = data.noOfOpening;
-    internship.minStipen = data.minStipen ? data.minStipen : 0;
-    internship.maxStipen = data.maxStipen ? data.maxStipen : 0;
-    internship.currencyType = data.currencyType ? data.currencyType : '';
     internship.internshipType = data.internshipType;
+
+    if (data.internshipType === 'onsite') {
+      internship.location = data.location;
+    } else {
+      internship.location = '';
+    }
+
     internship.internshipPeriod = data.internshipPeriod;
     internship.applyBy = data.applyBy;
     internship.startDate = data.startDate;
-    internship.responsibilities = data.responsibilities
-      ? data.responsibilities
-      : [];
+    internship.responsibilities = data.responsibilities;
     internship.perks = data.perks ? data.perks : [];
+    internship.interview = data.interview;
+    internship.prePlacementOffer = data.prePlacementOffer;
+    internship.category = data.category;
+    internship.questions = [
+      {
+        id: '1',
+        question:
+          'How many years of work experience do you have using Figma/sketch software ? ',
+        ansType: 'number',
+      },
+      {
+        id: '2',
+        question:
+          'Rate your self in figma tool skill out of 5? Where 5 being highest?',
+        ansType: 'number',
+      },
+      {
+        id: '3',
+        question: 'Add the link to your design portfolio?',
+        ansType: 'string',
+      },
+      {
+        id: '4',
+        question: 'Why do you think you are suitable for this role?',
+        ansType: 'string',
+      },
+    ];
 
     let payload: any;
 
