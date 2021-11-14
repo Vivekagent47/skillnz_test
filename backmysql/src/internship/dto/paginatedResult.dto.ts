@@ -2,7 +2,10 @@ import { Internship } from '../internship.entity';
 
 export class PaginatedResultDto {
   data: Internship[];
-  page: number;
+  currPage: number;
+  prevPage: number;
+  nextPage: number;
+  totalPages: number;
   limit: number;
   totalCount: number;
 }

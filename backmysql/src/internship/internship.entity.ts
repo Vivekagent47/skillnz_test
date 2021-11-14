@@ -31,7 +31,7 @@ export type Category =
 export type AnsType = 'number' | 'string';
 
 export type Question = {
-  id: string;
+  id: number;
   question: string;
   ansType: AnsType;
 };
@@ -134,7 +134,7 @@ export class Internship {
   /**
    * Work for Home or if Office work then place name
    */
-  @Column()
+  @Column({ type: 'enum', enum: ['workfromhome', 'onsite'] })
   internshipType: InternshipType;
 
   @Column()
@@ -174,11 +174,24 @@ export class Internship {
    * Category of the internship
    * @example engineering, commerce, management, science, arts, medical, law, humanities, other
    */
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: [
+      'engineering',
+      'commerce',
+      'management',
+      'science',
+      'arts',
+      'medical',
+      'law',
+      'humanities',
+      'other',
+    ],
+  })
   category: Category;
 
-  @Column('simple-array')
-  questions: Question[];
+  @Column('longtext')
+  questions: string;
 
   @Column()
   interview: boolean;
