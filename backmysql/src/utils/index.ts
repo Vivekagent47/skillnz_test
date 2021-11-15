@@ -5,3 +5,4 @@ export * from './guard/is-user.guard';
 export * from './decorator/auth-user.decorator';
 export * from './decorator/roles.decorator';
 export * from './interceptor/logger.interceptor';
+export * from './interfaces/internship';

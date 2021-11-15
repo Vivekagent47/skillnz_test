@@ -21,6 +21,7 @@ import { InternshipService } from './internship.service';
 import { PaginationDto } from './dto/pagination.dto';
 import { PaginatedResultDto } from './dto/paginatedResult.dto';
 import { CreateInternshipDto } from './dto/create-internship.dto';
+import { ApplyInternshipDto } from './dto/apply-internship.dto';
 
 /**
  * Internship Controller
@@ -93,7 +94,7 @@ export class InternshipController {
   async updateInternship(
     @Headers('authorization') token: string,
     @Param('id') id: string,
-    @Body() data: Partial<Internship>,
+    @Body() data: CreateInternshipDto,
   ): Promise<{ success: boolean; message: string }> {
     try {
       return await this.service.updateInternship(token, id, data);
@@ -112,6 +113,23 @@ export class InternshipController {
   ): Promise<{ success: boolean; message: string }> {
     try {
       return await this.service.activateInternship(id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Put('/apply/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async applyInternship(
+    @Headers('authorization') token: string,
+    @Param('id') id: string,
+    @Body() data: ApplyInternshipDto,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      return await this.service.applyInternship(token, id, data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

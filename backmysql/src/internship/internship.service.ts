@@ -12,8 +12,10 @@ import { Repository } from 'typeorm';
 import { CreateInternshipDto } from './dto/create-internship.dto';
 import { PaginatedResultDto } from './dto/paginatedResult.dto';
 import { PaginationDto } from './dto/pagination.dto';
-import { Internship, Question } from './internship.entity';
+import { Internship } from './internship.entity';
 import { UserService } from '../user';
+import { ApplyInternshipDto } from './dto/apply-internship.dto';
+import { ApplyInternship } from './applyinternship.entity';
 
 /**
  * Internship Service
@@ -23,6 +25,9 @@ export class InternshipService {
   constructor(
     @InjectRepository(Internship)
     private readonly internshipRepo: Repository<Internship>,
+
+    @InjectRepository(ApplyInternship)
+    private readonly applyInternshipRepo: Repository<ApplyInternship>,
 
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
@@ -115,7 +120,10 @@ export class InternshipService {
       }
 
       if (user.userType === 'recruiter' || user.roles.includes('admin')) {
-        return await this.internshipRepo.save(internship);
+        const data = await this.internshipRepo.save(internship);
+        data.questions = JSON.parse(data.questions);
+        delete data.applicant;
+        return data;
       }
 
       throw new HttpException(
@@ -127,7 +135,7 @@ export class InternshipService {
     }
   }
 
-  jsonToString(json_arr: Question[]): string {
+  jsonToString(json_arr: any[]): string {
     let jsonArr_string = '[';
     for (let i = 0; i < json_arr.length; i++) {
       jsonArr_string += JSON.stringify(json_arr[i]);
@@ -168,6 +176,7 @@ export class InternshipService {
 
     for (let i = 0; i < data.length; i++) {
       data[i].questions = JSON.parse(data[i].questions);
+      delete data[i].applicant;
     }
 
     return {
@@ -188,6 +197,7 @@ export class InternshipService {
     const data = await this.internshipRepo.find();
     for (let i = 0; i < data.length; i++) {
       data[i].questions = JSON.parse(data[i].questions);
+      delete data[i].applicant;
     }
 
     return data;
@@ -199,6 +209,7 @@ export class InternshipService {
   async getInternshipById(id: string): Promise<Internship> {
     const data = await this.internshipRepo.findOne(id);
     data.questions = JSON.parse(data.questions);
+    delete data.applicant;
     return data;
   }
 
@@ -208,17 +219,13 @@ export class InternshipService {
   async updateInternship(
     token: string,
     id: string,
-    data: Partial<Internship>,
+    data: CreateInternshipDto,
   ): Promise<{ success: boolean; message: string }> {
     let payload: any;
     try {
       payload = this.jwtService.verify(token.split(' ')[1]);
     } catch (err) {
       throw new Error('Invalid token');
-    }
-
-    if (data.isActive === false || data.isActive === true) {
-      throw new Error('Actice state is not changed from this route');
     }
 
     const internship = await this.internshipRepo.findOne(id);
@@ -230,12 +237,47 @@ export class InternshipService {
       }
 
       if (user.userType === 'recruiter' || user.roles.includes('admin')) {
-        if (id === internship.id) {
-          await this.internshipRepo.update(id, data);
-          return { success: true, message: 'Internship updated successfully' };
+        internship.jobName = data.jobName;
+        internship.companyName = data.companyName;
+        internship.companyUrl = data.companyUrl ? data.companyUrl : '';
+        internship.aboutCompany = data.aboutCompany ? data.aboutCompany : '';
+        internship.jobDescription = data.jobDescription
+          ? data.jobDescription
+          : '';
+        internship.skills = data.skills;
+        internship.compensation = data.compensation;
+
+        if (data.compensation === true) {
+          internship.minStipen = data.minStipen;
+          internship.maxStipen = data.maxStipen;
+          internship.currencyType = data.currencyType;
         } else {
-          throw new Error('Invalid Credientials');
+          internship.minStipen = 0;
+          internship.maxStipen = 0;
+          internship.currencyType = '';
         }
+
+        internship.noOfOpening = data.noOfOpening;
+        internship.internshipType = data.internshipType;
+
+        if (data.internshipType === 'onsite') {
+          internship.location = data.location;
+        } else {
+          internship.location = '';
+        }
+
+        internship.internshipPeriod = data.internshipPeriod;
+        internship.applyBy = data.applyBy;
+        internship.startDate = data.startDate;
+        internship.responsibilities = data.responsibilities;
+        internship.perks = data.perks ? data.perks : [];
+        internship.interview = data.interview;
+        internship.prePlacementOffer = data.prePlacementOffer;
+        internship.category = data.category;
+
+        await this.internshipRepo.save(internship);
+
+        return { success: true, message: 'Internship updated successfully' };
       }
 
       throw new HttpException(
@@ -257,5 +299,53 @@ export class InternshipService {
     internship.isActive = true;
     await this.internshipRepo.save(internship);
     return { success: true, message: 'Internship activated successfully' };
+  }
+
+  /**
+   * Apply Internship
+   */
+  async applyInternship(
+    token: string,
+    id: string,
+    data: ApplyInternshipDto,
+  ): Promise<any> {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token.split(' ')[1]);
+    } catch (err) {
+      throw new Error('Invalid token');
+    }
+
+    const internship = await this.internshipRepo.findOne(id);
+    const user = await this.userService.getUserById(payload.userId);
+
+    try {
+      if (!user.isActive) {
+        throw new Error('Inactive user');
+      }
+
+      if (user.userType === 'student') {
+        const newApplication = new ApplyInternship();
+        newApplication.userId = payload.userId;
+        newApplication.answers = this.jsonToString(data.answers);
+
+        const applyData = await this.applyInternshipRepo.save(newApplication);
+
+        internship.applicant.push(applyData.id);
+        await this.internshipRepo.save(internship);
+
+        return {
+          success: true,
+          message: 'Application submitted successfully',
+        };
+      }
+
+      throw new HttpException(
+        'You are not authorized to apply an internship',
+        HttpStatus.UNAUTHORIZED,
+      );
+    } catch (error) {
+      throw error;
+    }
   }
 }
