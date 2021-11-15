@@ -79,6 +79,7 @@ export class InternshipService {
     internship.interview = data.interview;
     internship.prePlacementOffer = data.prePlacementOffer;
     internship.category = data.category;
+    internship.numberOfApplicants = 0;
     internship.questions = this.jsonToString([
       {
         id: 1,
@@ -176,6 +177,7 @@ export class InternshipService {
 
     for (let i = 0; i < data.length; i++) {
       data[i].questions = JSON.parse(data[i].questions);
+      data[i].numberOfApplicants = data[i].applicant.length;
       delete data[i].applicant;
     }
 
@@ -197,6 +199,7 @@ export class InternshipService {
     const data = await this.internshipRepo.find();
     for (let i = 0; i < data.length; i++) {
       data[i].questions = JSON.parse(data[i].questions);
+      data[i].numberOfApplicants = data[i].applicant.length;
       delete data[i].applicant;
     }
 
@@ -209,6 +212,7 @@ export class InternshipService {
   async getInternshipById(id: string): Promise<Internship> {
     const data = await this.internshipRepo.findOne(id);
     data.questions = JSON.parse(data.questions);
+    data.numberOfApplicants = data.applicant.length;
     delete data.applicant;
     return data;
   }

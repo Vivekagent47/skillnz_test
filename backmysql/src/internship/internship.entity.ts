@@ -187,6 +187,9 @@ export class Internship {
   applicant: string[];
 
   @Column()
+  numberOfApplicants: number;
+
+  @Column()
   interview: boolean;
 
   @Column()
