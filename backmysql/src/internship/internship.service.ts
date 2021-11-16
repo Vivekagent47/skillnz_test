@@ -79,6 +79,7 @@ export class InternshipService {
     internship.interview = data.interview;
     internship.prePlacementOffer = data.prePlacementOffer;
     internship.category = data.category;
+    internship.applicant = [];
     internship.numberOfApplicants = 0;
     internship.questions = this.jsonToString([
       {
@@ -326,6 +327,15 @@ export class InternshipService {
     try {
       if (!user.isActive) {
         throw new Error('Inactive user');
+      }
+
+      for (let i = 0; i < internship.applicant.length; i++) {
+        const applicant = await this.applyInternshipRepo.findOne(
+          internship.applicant[i],
+        );
+        if (applicant.userId === payload.userId) {
+          throw new Error('You have already applied for this internship');
+        }
       }
 
       if (user.userType === 'student') {

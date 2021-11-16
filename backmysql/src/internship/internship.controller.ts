@@ -58,9 +58,6 @@ export class InternshipController {
   }
 
   @Get('/:id')
-  @ApiBearerAuth()
-  @UseGuards(RolesGuard)
-  @Roles('user', 'admin')
   @UseInterceptors(ClassSerializerInterceptor)
   async getOneInternship(@Param('id') id: string): Promise<Internship> {
     try {
