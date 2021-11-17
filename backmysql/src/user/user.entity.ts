@@ -76,8 +76,8 @@ export class User {
   /**
    * mobile number
    */
-  @Column()
-  mobileNumber: number;
+  @Column({ length: 10 })
+  mobileNumber: string;
 
   /**
    * created at

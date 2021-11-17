@@ -38,6 +38,6 @@ export interface IAuthUser {
   /**
    * mobile number and country code
    */
-  mobileNumber?: number;
+  mobileNumber?: string;
   countryCode?: string;
 }

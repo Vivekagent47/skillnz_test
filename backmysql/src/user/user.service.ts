@@ -28,7 +28,7 @@ export class UserService {
     user.roles = ['user'];
     user.isActive = true;
     user.userType = userData.userType;
-    user.mobileNumber = userData.mobileNumber ? userData.mobileNumber : 0;
+    user.mobileNumber = userData.mobileNumber ? userData.mobileNumber : '';
     user.countryCode = userData.countryCode ? userData.countryCode : '';
     user.password = await this.hashPassword(userData.password);
 

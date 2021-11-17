@@ -1,4 +1,10 @@
-import { MaxLength, MinLength, IsEmail, IsNotEmpty } from 'class-validator';
+import {
+  MaxLength,
+  MinLength,
+  IsEmail,
+  IsNotEmpty,
+  Length,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserType } from '../../utils';
 
@@ -43,8 +49,9 @@ export class CreateUserDto {
   })
   readonly password: string;
 
+  @Length(10, 10)
   @ApiProperty()
-  readonly mobileNumber: number;
+  readonly mobileNumber: string;
 
   @ApiProperty()
   readonly countryCode: string;
