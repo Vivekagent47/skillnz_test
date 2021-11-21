@@ -17,12 +17,13 @@ import { JwtTokenMiddleware, LoggerInterceptor } from './utils';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import * as ormConfig from './orm.config';
+import { JWT_SECRET } from './config';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormConfig),
     JwtModule.register({
-      secret: 'M6[n0@u0t[O$Q1(',
+      secret: JWT_SECRET,
       signOptions: { expiresIn: '60s' },
     }),
     WinstonModule.forRoot(loggerConf),

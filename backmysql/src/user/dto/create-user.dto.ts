@@ -57,6 +57,6 @@ export class CreateUserDto {
   readonly countryCode: string;
 
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({ enum: ['student', 'recruiter'] })
   readonly userType: UserType;
 }

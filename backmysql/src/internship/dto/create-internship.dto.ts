@@ -49,7 +49,7 @@ export class CreateInternshipDto {
   readonly noOfOpening: number;
 
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({ enum: ['workfromhome', 'onsite'] })
   readonly internshipType: InternshipType;
 
   @ApiProperty()
@@ -76,7 +76,19 @@ export class CreateInternshipDto {
   readonly perks: string[];
 
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({
+    enum: [
+      'engineering',
+      'commerce',
+      'management',
+      'science',
+      'arts',
+      'medical',
+      'law',
+      'humanities',
+      'other',
+    ],
+  })
   readonly category: Category;
 
   @IsNotEmpty()

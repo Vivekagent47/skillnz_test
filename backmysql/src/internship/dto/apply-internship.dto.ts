@@ -8,6 +8,9 @@ export type Answer = {
 
 export class ApplyInternshipDto {
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({
+    isArray: true,
+    example: [{ questionID: 1, answer: 'answer' }],
+  })
   readonly answers: Answer[];
 }

@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { JWT_SECRET } from 'src/config';
 
 @Module({
   imports: [
     JwtModule.register({
-      secret: 'M6[n0@u0t[O$Q1(',
+      secret: JWT_SECRET,
       signOptions: { expiresIn: '60m' },
     }),
   ],
