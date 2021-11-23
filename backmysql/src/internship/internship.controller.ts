@@ -57,6 +57,19 @@ export class InternshipController {
     }
   }
 
+  @Get('/activeAll')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getInternshipByAllActive(): Promise<Internship[]> {
+    try {
+      return await this.service.getInternshipByAllActive();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Get('/:id')
   @UseInterceptors(ClassSerializerInterceptor)
   async getOneInternship(@Param('id') id: string): Promise<Internship> {

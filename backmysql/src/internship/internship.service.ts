@@ -194,6 +194,25 @@ export class InternshipService {
   }
 
   /**
+   * get all active internship
+   */
+  async getInternshipByAllActive(): Promise<Internship[]> {
+    const data = await this.internshipRepo
+      .createQueryBuilder()
+      .orderBy('createdAt', 'DESC')
+      .andHaving('isActive = :isActive', { isActive: true })
+      .getMany();
+
+    for (let i = 0; i < data.length; i++) {
+      data[i].questions = JSON.parse(data[i].questions);
+      data[i].numberOfApplicants = data[i].applicant.length;
+      delete data[i].applicant;
+    }
+
+    return data;
+  }
+
+  /**
    * get All the internship
    */
   async getAllInternships(): Promise<Internship[]> {
