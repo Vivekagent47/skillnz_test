@@ -80,6 +80,12 @@ export class User {
   mobileNumber: string;
 
   /**
+   * user profile
+   */
+  @Column()
+  profile: string;
+
+  /**
    * created at
    */
   @Exclude()
