@@ -43,7 +43,6 @@ export class InternshipService {
     data: CreateInternshipDto,
   ): Promise<Internship> {
     const internship = new Internship();
-    internship.isActive = false;
     internship.jobName = data.jobName;
     internship.companyName = data.companyName;
     internship.companyUrl = data.companyUrl ? data.companyUrl : '';
@@ -122,10 +121,30 @@ export class InternshipService {
       }
 
       if (user.userType === 'recruiter' || user.roles.includes('admin')) {
-        const data = await this.internshipRepo.save(internship);
-        data.questions = JSON.parse(data.questions);
-        delete data.applicant;
-        return data;
+        if (user.roles.includes('admin')) {
+          internship.isActive = true;
+        } else if (user.userType === 'recruiter') {
+          internship.isActive = false;
+        }
+
+        const temp = await this.internshipRepo.save(internship);
+        temp.questions = JSON.parse(temp.questions);
+        delete temp.applicant;
+
+        if (user.roles.includes('admin')) {
+          try {
+            await this.userService.createInternship(data.recuiterId, temp.id);
+          } catch (err) {
+            throw new Error(err);
+          }
+        } else if (user.userType === 'recruiter') {
+          try {
+            await this.userService.createInternship(user.id, temp.id);
+          } catch (err) {
+            throw new Error(err);
+          }
+        }
+        return temp;
       }
 
       throw new HttpException(
@@ -155,6 +174,7 @@ export class InternshipService {
    */
   async getInternships(
     paginationDto: PaginationDto,
+    token: string,
   ): Promise<PaginatedResultDto> {
     const skippedItems = (paginationDto.page - 1) * paginationDto.limit;
 
@@ -168,6 +188,16 @@ export class InternshipService {
         : totalPages;
     const prevPage = paginationDto.page - 1 >= 1 ? paginationDto.page - 1 : 1;
 
+    let payload: any, user: any;
+    if (token) {
+      try {
+        payload = await this.jwtService.verify(token.split(' ')[1]);
+        user = await this.userService.getUserById(payload.userId);
+      } catch (err) {
+        throw new Error('Invalid token');
+      }
+    }
+
     const data = await this.internshipRepo
       .createQueryBuilder()
       .orderBy('createdAt', 'DESC')
@@ -179,7 +209,11 @@ export class InternshipService {
     for (let i = 0; i < data.length; i++) {
       data[i].questions = JSON.parse(data[i].questions);
       data[i].numberOfApplicants = data[i].applicant.length;
-      delete data[i].applicant;
+      if (!token) {
+        delete data[i].applicant;
+      } else if (user.userType === 'student') {
+        delete data[i].applicant;
+      }
     }
 
     return {
@@ -196,7 +230,17 @@ export class InternshipService {
   /**
    * get all active internship
    */
-  async getInternshipByAllActive(): Promise<Internship[]> {
+  async getInternshipByAllActive(token: string): Promise<Internship[]> {
+    let payload: any, user: any;
+    if (token) {
+      try {
+        payload = await this.jwtService.verify(token.split(' ')[1]);
+        user = await this.userService.getUserById(payload.userId);
+      } catch (err) {
+        throw new Error('Invalid token');
+      }
+    }
+
     const data = await this.internshipRepo
       .createQueryBuilder()
       .orderBy('createdAt', 'DESC')
@@ -206,7 +250,11 @@ export class InternshipService {
     for (let i = 0; i < data.length; i++) {
       data[i].questions = JSON.parse(data[i].questions);
       data[i].numberOfApplicants = data[i].applicant.length;
-      delete data[i].applicant;
+      if (!token) {
+        delete data[i].applicant;
+      } else if (user.userType === 'student') {
+        delete data[i].applicant;
+      }
     }
 
     return data;
@@ -215,25 +263,65 @@ export class InternshipService {
   /**
    * get All the internship
    */
-  async getAllInternships(): Promise<Internship[]> {
-    const data = await this.internshipRepo.find();
-    for (let i = 0; i < data.length; i++) {
-      data[i].questions = JSON.parse(data[i].questions);
-      data[i].numberOfApplicants = data[i].applicant.length;
-      delete data[i].applicant;
+  async getAllInternships(token: string): Promise<Internship[]> {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token.split(' ')[1]);
+    } catch (err) {
+      throw new Error('Invalid token');
     }
 
-    return data;
+    const user = await this.userService.getUserById(payload.userId);
+
+    if (!user) {
+      throw new Error('Invalid token');
+    }
+
+    if (!user.isActive) {
+      throw new Error('User is not active');
+    }
+
+    if (user.userType === 'recruiter' || user.roles.includes('admin')) {
+      const data = await this.internshipRepo
+        .createQueryBuilder()
+        .orderBy('createdAt', 'DESC')
+        .getMany();
+
+      for (let i = 0; i < data.length; i++) {
+        data[i].questions = JSON.parse(data[i].questions);
+        data[i].numberOfApplicants = data[i].applicant.length;
+      }
+      return data;
+    } else {
+      throw new HttpException(
+        'You are not authorized to view all internship',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 
   /**
    * gel internship by ID
    */
-  async getInternshipById(id: string): Promise<Internship> {
+  async getInternshipById(token: string, id: string): Promise<Internship> {
+    let payload: any, user: any;
+    if (token) {
+      try {
+        payload = await this.jwtService.verify(token.split(' ')[1]);
+        user = await this.userService.getUserById(payload.userId);
+      } catch (err) {
+        throw new Error('Invalid token');
+      }
+    }
+
     const data = await this.internshipRepo.findOne(id);
     data.questions = JSON.parse(data.questions);
     data.numberOfApplicants = data.applicant.length;
-    delete data.applicant;
+    if (!token) {
+      delete data.applicant;
+    } else if (user.userType === 'student') {
+      delete data.applicant;
+    }
     return data;
   }
 
@@ -319,10 +407,39 @@ export class InternshipService {
   async activateInternship(
     id: string,
   ): Promise<{ success: boolean; message: string }> {
-    const internship = await this.internshipRepo.findOne(id);
-    internship.isActive = true;
-    await this.internshipRepo.save(internship);
+    await this.internshipRepo.update(id, { isActive: true });
     return { success: true, message: 'Internship activated successfully' };
+  }
+
+  /**
+   * Deactive Internship
+   */
+  async deactivateInternship(
+    id: string,
+    token: string,
+  ): Promise<{ success: boolean; message: string }> {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token.split(' ')[1]);
+    } catch (err) {
+      throw new Error('Invalid token');
+    }
+
+    const user = await this.userService.getUserById(payload.userId);
+
+    if (!user.isActive) {
+      throw new Error('Inactive user');
+    }
+
+    if (user.userType === 'recruiter' || user.roles.includes('admin')) {
+      await this.internshipRepo.update(id, { isActive: false });
+      return { success: true, message: 'Internship deactivated successfully' };
+    } else {
+      throw new HttpException(
+        'You are not authorized to deactivate an internship',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 
   /**

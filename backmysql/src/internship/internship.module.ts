@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SharedModule } from 'src/shared/shared.module';
-import { UserModule } from 'src/user/user.module';
+import { SharedModule } from '../shared/shared.module';
+import { UserModule } from '../user/user.module';
 import { ApplyInternship } from './applyinternship.entity';
 import { ApplyInternshipRepository } from './applyinternship.repository';
 import { InternshipController } from './internship.controller';

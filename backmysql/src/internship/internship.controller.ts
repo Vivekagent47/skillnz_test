@@ -33,38 +33,43 @@ export class InternshipController {
   @Get()
   @UseInterceptors(ClassSerializerInterceptor)
   async getPanginatedInternship(
+    @Headers('authorization') token: string,
     @Query() data: PaginationDto,
   ): Promise<PaginatedResultDto> {
     data.page = Number(data.page);
     data.limit = Number(data.limit ? data.limit : 18);
 
-    return await this.service.getInternships({
-      ...data,
-      limit: data.limit > 18 ? 18 : data.limit,
-    });
+    return await this.service.getInternships(
+      {
+        ...data,
+        limit: data.limit > 18 ? 18 : data.limit,
+      },
+      token,
+    );
   }
 
   @Get('/all')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'user')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getAllInternships(): Promise<Internship[]> {
+  async getAllInternships(
+    @Headers('authorization') token: string,
+  ): Promise<Internship[]> {
     try {
-      return await this.service.getAllInternships();
+      return await this.service.getAllInternships(token);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
   @Get('/activeAll')
-  @ApiBearerAuth()
-  @UseGuards(RolesGuard)
-  @Roles('admin', 'user')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getInternshipByAllActive(): Promise<Internship[]> {
+  async getInternshipByAllActive(
+    @Headers('authorization') token: string,
+  ): Promise<Internship[]> {
     try {
-      return await this.service.getInternshipByAllActive();
+      return await this.service.getInternshipByAllActive(token);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -72,9 +77,12 @@ export class InternshipController {
 
   @Get('/:id')
   @UseInterceptors(ClassSerializerInterceptor)
-  async getOneInternship(@Param('id') id: string): Promise<Internship> {
+  async getOneInternship(
+    @Headers('authorization') token: string,
+    @Param('id') id: string,
+  ): Promise<Internship> {
     try {
-      return await this.service.getInternshipById(id);
+      return await this.service.getInternshipById(token, id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -123,6 +131,22 @@ export class InternshipController {
   ): Promise<{ success: boolean; message: string }> {
     try {
       return await this.service.activateInternship(id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Put('/deactivate/:id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'user')
+  @UseInterceptors(ClassSerializerInterceptor)
+  async deactiveInternship(
+    @Headers('authorization') token: string,
+    @Param('id') id: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      return await this.service.deactivateInternship(id, token);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

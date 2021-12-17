@@ -6,6 +6,9 @@ import { Category, InternshipType } from '../internship.entity';
  * Internship create dto
  */
 export class CreateInternshipDto {
+  @ApiProperty()
+  readonly recuiterId: string;
+
   @IsNotEmpty()
   @MinLength(5)
   @MaxLength(30)
