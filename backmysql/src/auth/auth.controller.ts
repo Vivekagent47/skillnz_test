@@ -32,7 +32,9 @@ export class AuthController {
   @UseInterceptors(ClassSerializerInterceptor)
   async register(@Body() userDto: CreateUserDto): Promise<User> {
     try {
-      return await this.service.registerUser(userDto);
+      const temp = await this.service.registerUser(userDto);
+      await this.service.refisterProfile(temp);
+      return temp;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

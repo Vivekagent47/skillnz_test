@@ -25,6 +25,15 @@ export class AuthService {
     return this.userService.createUser(userData);
   }
 
+  async refisterProfile(user: User) {
+    if (user.userType === 'student') {
+      await this.userService.initialStudentProfile(user.id);
+    }
+    if (user.userType === 'recruiter') {
+      await this.userService.initialRecruiterProfile(user.id);
+    }
+  }
+
   /**
    * login user
    */
