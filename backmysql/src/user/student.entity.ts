@@ -32,6 +32,33 @@ export class Student {
   @Column()
   currentLocation: string;
 
+  @Column()
+  title: string;
+
+  @Column()
+  discription: string;
+
+  @Column()
+  socials: string;
+
+  @Column()
+  protfolios: string;
+
+  @Column('simple-array')
+  begnierSkills: string[];
+
+  @Column('simple-array')
+  advancedSkills: string[];
+
+  @Column('simple-array')
+  intermediateSkills: string[];
+
+  @Column('simple-array')
+  education: string[];
+
+  @Column('simple-array')
+  experience: string[];
+
   /**
    * created at
    */
